@@ -1,0 +1,49 @@
+# Dependências
+/.bundle
+/vendor/bundle
+
+# Banco de dados
+/db/*.sqlite3
+/db/*.sqlite3-journal
+
+# Logs e temporários
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# Uploads
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/.keep
+
+# Credenciais e segredos
+/config/master.key
+/config/credentials/*.key
+.env
+.env.local
+.env.*.local
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Cobertura de testes
+/coverage
+
+# Node (se usar)
+/node_modules
+yarn-error.log
+
+# Kamal / Docker
+.kamal/secrets
+
+CLAUDE.md
+.claude

@@ -1,0 +1,33 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("DB_HOST", "localhost") %>
+  port: <%= ENV.fetch("DB_PORT", 5432) %>
+  username: <%= ENV["DB_USERNAME"] %>
+  password: <%= ENV["DB_PASSWORD"] %>
+
+development:
+  <<: *default
+  database: <%= ENV.fetch("DB_NAME_DEV", "acervo_smd_development") %>
+
+test:
+  <<: *default
+  database: <%= ENV.fetch("DB_NAME_TEST", "acervo_smd_test") %>
+
+production:
+  primary: &primary_production
+    <<: *default
+    database: <%= ENV.fetch("DB_NAME_PROD", "acervo_smd_production") %>
+  cache:
+    <<: *primary_production
+    database: <%= ENV.fetch("DB_NAME_PROD", "acervo_smd_production") %>_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: <%= ENV.fetch("DB_NAME_PROD", "acervo_smd_production") %>_queue
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    database: <%= ENV.fetch("DB_NAME_PROD", "acervo_smd_production") %>_cable
+    migrations_paths: db/cable_migrate
