@@ -103,6 +103,40 @@ RSpec.describe "Conteudos", type: :request do
       post "/conteudos", params: { conteudo: params[:conteudo].merge(titulo: "") }, headers: auth_headers_for(user), as: :json
       expect(response).to have_http_status(:unprocessable_entity)
     end
+
+    context "upload de imagem" do
+      let(:imagem) { fixture_file_upload(Rails.root.join("spec/fixtures/files/foto.jpg"), "image/jpeg") }
+
+      it "aceita imagem em projeto" do
+        post "/conteudos",
+          params: { conteudo: { tipo: "projeto", titulo: "Título", descricao: "Desc", imagem: imagem } },
+          headers: auth_headers_for(user)
+        expect(response).to have_http_status(:created)
+        expect(Conteudo.last.imagem).to be_attached
+      end
+
+      it "aceita imagem em divulgacao" do
+        post "/conteudos",
+          params: { conteudo: { tipo: "divulgacao", titulo: "Título", descricao: "Desc", imagem: imagem } },
+          headers: auth_headers_for(user)
+        expect(response).to have_http_status(:created)
+        expect(Conteudo.last.imagem).to be_attached
+      end
+
+      it "rejeita imagem em artigo" do
+        post "/conteudos",
+          params: { conteudo: { tipo: "artigo", titulo: "Título", descricao: "Desc", imagem: imagem } },
+          headers: auth_headers_for(user)
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "cria projeto sem imagem normalmente" do
+        post "/conteudos",
+          params: { conteudo: { tipo: "projeto", titulo: "Título", descricao: "Desc" } },
+          headers: auth_headers_for(user), as: :json
+        expect(response).to have_http_status(:created)
+      end
+    end
   end
 
   describe "PUT /conteudos/:id" do

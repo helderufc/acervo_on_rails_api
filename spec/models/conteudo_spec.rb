@@ -16,5 +16,44 @@ RSpec.describe Conteudo, type: :model do
     it { should have_many(:marcadores_conteudos).class_name("MarcadorConteudo").dependent(:destroy) }
     it { should have_many(:marcadores).through(:marcadores_conteudos) }
     it { should have_many(:denuncias).dependent(:destroy) }
+    it { should have_one_attached(:imagem) }
+  end
+
+  describe "imagem" do
+    it "é inválida para artigo com imagem anexada" do
+      conteudo = build(:conteudo, tipo: :artigo)
+      conteudo.imagem.attach(
+        io: StringIO.new("fake"),
+        filename: "foto.jpg",
+        content_type: "image/jpeg"
+      )
+      expect(conteudo).not_to be_valid
+      expect(conteudo.errors[:imagem]).to include("não é permitida para artigos")
+    end
+
+    it "é válida para projeto com imagem anexada" do
+      conteudo = build(:conteudo, tipo: :projeto)
+      conteudo.imagem.attach(
+        io: StringIO.new("fake"),
+        filename: "foto.jpg",
+        content_type: "image/jpeg"
+      )
+      expect(conteudo).to be_valid
+    end
+
+    it "é válida para divulgacao com imagem anexada" do
+      conteudo = build(:conteudo, tipo: :divulgacao)
+      conteudo.imagem.attach(
+        io: StringIO.new("fake"),
+        filename: "foto.jpg",
+        content_type: "image/jpeg"
+      )
+      expect(conteudo).to be_valid
+    end
+
+    it "é válida para projeto sem imagem" do
+      conteudo = build(:conteudo, tipo: :projeto)
+      expect(conteudo).to be_valid
+    end
   end
 end

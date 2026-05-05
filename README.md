@@ -85,3 +85,4 @@ bundle exec rspec
 | `DB_NAME_DEV` | Nome do banco de desenvolvimento | `acervo_smd_development` |
 | `DB_NAME_TEST` | Nome do banco de testes | `acervo_smd_test` |
 | `CORS_ORIGINS` | Origens permitidas pelo CORS | `http://localhost:5173` |
+| `ASSET_HOST` | Host base para URLs de arquivos enviados | `http://localhost:3000` |
