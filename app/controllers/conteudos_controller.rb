@@ -6,6 +6,8 @@ class ConteudosController < ApplicationController
     conteudos = conteudos.where(tipo: params[:tipo]) if params[:tipo].present?
     conteudos = conteudos.where(autor_id: params[:autor_id]) if params[:autor_id].present?
     conteudos = conteudos.joins(:marcadores).where(marcadores: { id: params[:marcador_id] }) if params[:marcador_id].present?
+    conteudos = conteudos.com_marcadores_ids(params[:marcador_ids]) if params[:marcador_ids].present?
+    conteudos = conteudos.com_marcadores_nomes(params[:marcadores]) if params[:marcadores].present?
     conteudos = conteudos.where("titulo ILIKE ?", "%#{params[:q]}%") if params[:q].present?
     conteudos = conteudos.page(params[:page]).per(params[:per_page] || 20)
 

@@ -7,4 +7,14 @@ class Conteudo < ApplicationRecord
   enum :tipo, { artigo: 0, divulgacao: 1, projeto: 2 }
 
   validates :titulo, :descricao, :tipo, presence: true
+
+  scope :com_marcadores_ids, ->(ids) {
+    joins(:marcadores).where(marcadores: { id: ids }).distinct
+  }
+
+  scope :com_marcadores_nomes, ->(nomes) {
+    joins(:marcadores)
+      .where(marcadores: { nome: Array(nomes).map { |n| n.downcase.strip } })
+      .distinct
+  }
 end

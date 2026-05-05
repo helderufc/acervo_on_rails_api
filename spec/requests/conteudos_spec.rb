@@ -29,6 +29,41 @@ RSpec.describe "Conteudos", type: :request do
       titulos = JSON.parse(response.body)["data"].map { |c| c.dig("attributes", "titulo") }
       expect(titulos).to include("Rails para iniciantes")
     end
+
+    context "filtro por marcadores" do
+      let!(:marcador_a) { create(:marcador, nome: "design") }
+      let!(:marcador_b) { create(:marcador, nome: "ux") }
+      let!(:com_design)   { create(:conteudo).tap { |c| c.marcadores << marcador_a } }
+      let!(:com_ux)       { create(:conteudo).tap { |c| c.marcadores << marcador_b } }
+      let!(:sem_marcador) { create(:conteudo) }
+
+      it "filtra por múltiplos marcador_ids com OR" do
+        get "/conteudos?marcador_ids[]=#{marcador_a.id}&marcador_ids[]=#{marcador_b.id}"
+        ids = JSON.parse(response.body)["data"].map { |c| c["id"].to_i }
+        expect(ids).to include(com_design.id, com_ux.id)
+        expect(ids).not_to include(sem_marcador.id)
+      end
+
+      it "filtra por nome de marcador" do
+        get "/conteudos?marcadores[]=design"
+        ids = JSON.parse(response.body)["data"].map { |c| c["id"].to_i }
+        expect(ids).to include(com_design.id)
+        expect(ids).not_to include(com_ux.id, sem_marcador.id)
+      end
+
+      it "filtra por múltiplos nomes com OR" do
+        get "/conteudos?marcadores[]=design&marcadores[]=ux"
+        ids = JSON.parse(response.body)["data"].map { |c| c["id"].to_i }
+        expect(ids).to include(com_design.id, com_ux.id)
+        expect(ids).not_to include(sem_marcador.id)
+      end
+
+      it "nome é case-insensitive" do
+        get "/conteudos?marcadores[]=DESIGN"
+        ids = JSON.parse(response.body)["data"].map { |c| c["id"].to_i }
+        expect(ids).to include(com_design.id)
+      end
+    end
   end
 
   describe "GET /conteudos/:id" do
