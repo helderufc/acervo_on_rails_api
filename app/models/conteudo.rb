@@ -9,6 +9,7 @@ class Conteudo < ApplicationRecord
 
   validates :titulo, :descricao, :tipo, presence: true
   validate :imagem_somente_para_projeto_ou_divulgacao
+  validate :links_no_maximo_tres
 
   scope :com_marcadores_ids, ->(ids) {
     joins(:marcadores).where(marcadores: { id: ids }).distinct
@@ -24,5 +25,9 @@ class Conteudo < ApplicationRecord
 
   def imagem_somente_para_projeto_ou_divulgacao
     errors.add(:imagem, "não é permitida para artigos") if imagem.attached? && artigo?
+  end
+
+  def links_no_maximo_tres
+    errors.add(:links, "pode ter no máximo 3 links") if links.length > 3
   end
 end

@@ -56,4 +56,22 @@ RSpec.describe Conteudo, type: :model do
       expect(conteudo).to be_valid
     end
   end
+
+  describe "links" do
+    it "é válido com até 3 links" do
+      conteudo = build(:conteudo, links: ["https://a.com", "https://b.com", "https://c.com"])
+      expect(conteudo).to be_valid
+    end
+
+    it "é inválido com mais de 3 links" do
+      conteudo = build(:conteudo, links: ["https://a.com", "https://b.com", "https://c.com", "https://d.com"])
+      expect(conteudo).not_to be_valid
+      expect(conteudo.errors[:links]).to include("pode ter no máximo 3 links")
+    end
+
+    it "é válido sem links" do
+      conteudo = build(:conteudo, links: [])
+      expect(conteudo).to be_valid
+    end
+  end
 end
