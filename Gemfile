@@ -30,6 +30,9 @@ gem "rack-cors"
 # Pagination
 gem "kaminari"
 
+# Cache
+gem "redis"
+
 group :development, :test do
   gem "dotenv-rails"
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
