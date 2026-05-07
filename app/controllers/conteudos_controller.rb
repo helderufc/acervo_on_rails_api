@@ -2,16 +2,19 @@ class ConteudosController < ApplicationController
   before_action :set_conteudo, only: [ :show, :update, :destroy ]
 
   def index
-    conteudos = Conteudo.all
+    conteudos = Conteudo.includes(:autor, imagem_attachment: :blob)
     conteudos = conteudos.where(tipo: params[:tipo]) if params[:tipo].present?
     conteudos = conteudos.where(autor_id: params[:autor_id]) if params[:autor_id].present?
     conteudos = conteudos.joins(:marcadores).where(marcadores: { id: params[:marcador_id] }) if params[:marcador_id].present?
     conteudos = conteudos.com_marcadores_ids(params[:marcador_ids]) if params[:marcador_ids].present?
     conteudos = conteudos.com_marcadores_nomes(params[:marcadores]) if params[:marcadores].present?
     conteudos = conteudos.where("titulo ILIKE ?", "%#{params[:q]}%") if params[:q].present?
-    conteudos = conteudos.page(params[:page]).per(params[:per_page] || 20)
+    conteudos = conteudos.page(params[:page]).per(per_page_param)
 
-    render json: ConteudoSerializer.new(conteudos).serializable_hash
+    json = Rails.cache.fetch(index_cache_key, expires_in: 15.seconds) do
+      ConteudoSerializer.new(conteudos).serializable_hash.to_json
+    end
+    render json: json
   end
 
   def show
@@ -45,11 +48,30 @@ class ConteudosController < ApplicationController
   private
 
   def set_conteudo
-    @conteudo = Conteudo.find(params[:id])
+    @conteudo = Conteudo.includes(:autor, imagem_attachment: :blob).find(params[:id])
   end
 
   def conteudo_params
     params.require(:conteudo).permit(:tipo, :titulo, :descricao, :imagem, links: [])
+  end
+
+  def per_page_param
+    per = params[:per_page].to_i
+    per.between?(1, 100) ? per : 20
+  end
+
+  def index_cache_key
+    [
+      "conteudos/index",
+      params[:tipo],
+      params[:autor_id],
+      params[:marcador_id],
+      Array(params[:marcador_ids]).sort.join("-"),
+      Array(params[:marcadores]).sort.join("-"),
+      params[:q],
+      params[:page] || 1,
+      per_page_param
+    ].join("/")
   end
 
   def public_action?

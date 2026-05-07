@@ -2,8 +2,9 @@ class Admin::DenunciasController < Admin::BaseController
   before_action :set_denuncia, only: [ :show, :resolver, :ignorar ]
 
   def index
-    denuncias = Denuncia.all
+    denuncias = Denuncia.includes(:denunciante, :motivo, :usuario, conteudo: [:autor, imagem_attachment: :blob])
     denuncias = denuncias.where(status: params[:status]) if params[:status].present?
+    denuncias = denuncias.page(params[:page]).per(50)
     render json: DenunciaSerializer.new(denuncias).serializable_hash
   end
 

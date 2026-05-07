@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_05_173710) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_07_124321) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -52,6 +52,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_05_173710) do
     t.string "titulo", null: false
     t.datetime "updated_at", null: false
     t.index ["autor_id"], name: "index_conteudos_on_autor_id"
+    t.index ["tipo"], name: "index_conteudos_on_tipo"
+    t.index ["titulo"], name: "index_conteudos_on_titulo", opclass: :gin_trgm_ops, using: :gin
   end
 
   create_table "denuncias", force: :cascade do |t|
